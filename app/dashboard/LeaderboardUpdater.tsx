@@ -1,84 +1,109 @@
 "use client";
+import { useEffect, useState } from "react";
 
-import React, { useState } from "react";
+type Team = {
+  id: number;
+  name: string;
+  points: number;
+  logoUrl: string;
+  color: "brown" | "blue";
+};
 
-export function LeaderboardUpdater({
-  teams,
-}: {
-  teams: { id: number; name: string }[];
-}) {
-  const [selectedTeam, setSelectedTeam] = useState(teams[0]?.id ?? 0);
-  const [points, setPoints] = useState("");
+export default function LeaderboardUpdater() {
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updatedPoints, setUpdatedPoints] = useState<{ [id: number]: number }>(
+    {}
+  );
 
-  const updateLeaderboard = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  useEffect(() => {
+    fetch("/api/teams")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.teams)) {
+          setTeams(data.teams); // ✅ Fix: Access `teams` property from API response
+        } else {
+          setError("Invalid data format from API");
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to fetch teams");
+        setLoading(false);
+      });
+  }, []);
 
-    const res = await fetch(`/api/leaderboard/${selectedTeam}`, {
-      method: "PUT",
-      body: JSON.stringify({ points: Number(points) }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const updatePoints = async (id: number) => {
+    const newPoints = updatedPoints[id];
+
+    if (newPoints === undefined) return;
+
+    const res = await fetch("/api/teams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, points: newPoints }),
     });
 
-    const data = await res.json();
     if (res.ok) {
-      alert(`Leaderboard updated: ${data.message}`);
-    } else {
-      alert("Failed to update leaderboard");
+      setTeams((prev) =>
+        prev.map((team) =>
+          team.id === id ? { ...team, points: newPoints } : team
+        )
+      );
     }
   };
 
+  if (loading) return <p>Loading teams...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
   return (
-    <div className="p-4 max-w-md mx-auto bg-white rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">
-        Update Leaderboard
-      </h2>
-      <form onSubmit={updateLeaderboard} className="space-y-4">
-        <div>
-          <label
-            htmlFor="team"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Team
-          </label>
-          <select
-            id="team"
-            name="team"
-            value={selectedTeam}
-            onChange={(e) => setSelectedTeam(Number(e.target.value))}
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
+    <div className="p-6 bg-gray-900 text-white rounded-lg shadow-lg max-w-3xl mx-auto">
+      <h1 className="text-xl font-bold mb-4">Leaderboard Updater</h1>
+      {teams.length === 0 ? (
+        <p>No teams available.</p>
+      ) : (
+        <div className="space-y-4">
+          {teams.map((team) => (
+            <div
+              key={team.id}
+              className={`p-4 rounded-lg flex items-center justify-between ${
+                team.color === "brown" ? "bg-amber-800/25" : "bg-blue-600/25"
+              }`}
+            >
+              <div className="flex items-center space-x-4">
+                <img
+                  src={team.logoUrl || "/logo.png"}
+                  alt={team.name}
+                  className="h-12 w-12"
+                />
+                <div>
+                  <h2 className="text-lg font-semibold">{team.name}</h2>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="number"
+                  value={updatedPoints[team.id] ?? team.points}
+                  onChange={(e) =>
+                    setUpdatedPoints({
+                      ...updatedPoints,
+                      [team.id]: Number(e.target.value),
+                    })
+                  }
+                  className="bg-gray-700 text-white rounded px-3 py-1 w-20"
+                />
+                <button
+                  onClick={() => updatePoints(team.id)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-        <div>
-          <label
-            htmlFor="points"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Points
-          </label>
-          <input
-            type="number"
-            name="points"
-            id="points"
-            value={points}
-            onChange={(e) => setPoints(e.target.value)}
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Save
-        </button>
-      </form>
+      )}
     </div>
   );
 }

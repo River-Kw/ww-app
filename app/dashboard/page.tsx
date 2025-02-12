@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ProfileForm } from "./ProfileForm";
-import { LeaderboardUpdater } from "./LeaderboardUpdater";
+import LeaderboardUpdater from "./LeaderboardUpdater";
 import { redirect } from "next/navigation";
 // import { SignOutButton } from "@/components/buttons";
 import { authOptions } from "../api/auth/[...nextauth]/route";
@@ -29,12 +29,7 @@ export default async function Dashboard() {
         {/* <SignOutButton /> Uncomment and use if needed */}
         {/* <ProfileForm user={user} /> Uncomment and use if needed */}
         <div className="">
-          <LeaderboardUpdater
-            teams={[
-              { id: 1, name: "Team A" },
-              { id: 2, name: "Team B" },
-            ]}
-          />
+          <LeaderboardUpdater />
         </div>
       </div>
     </main>

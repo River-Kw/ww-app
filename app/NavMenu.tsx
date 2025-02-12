@@ -11,7 +11,6 @@ export default function NavMenu() {
               <h1 className="text-3xl font-bold">Winter War</h1>
             </a>
             <h2 className="text-lg">Competition Standings</h2>
-            <h3 className="text-sm">Updated 8 Hours ago</h3>
           </div>
           <ul className="flex items-center space-x-4">
             <li>

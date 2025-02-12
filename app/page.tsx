@@ -12,24 +12,7 @@ export default async function Home() {
     <main className="bg-slate-800 text-white">
       <div className="container mx-auto min-h-screen">
         <div className="py-4">
-          <Leaderboard
-            teamName="Armadyl"
-            points={100}
-            mostRecentDrop="Twisted Bow"
-            timeAgo="12 Hours ago"
-            logoUrl="/armadyl.png"
-            color="blue"
-          />
-        </div>
-        <div className="py-4">
-          <Leaderboard
-            teamName="Bandos"
-            points={100}
-            mostRecentDrop="Twisted Bow"
-            timeAgo="12 Hours ago"
-            logoUrl="/bandos.png"
-            color="red"
-          />
+          <Leaderboard />
         </div>
       </div>
     </main>
