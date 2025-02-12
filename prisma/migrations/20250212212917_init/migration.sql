@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Team" ADD COLUMN     "experience" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "gainedExp" INTEGER NOT NULL DEFAULT 0;

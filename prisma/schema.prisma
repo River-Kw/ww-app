@@ -75,4 +75,6 @@ model Team {
   color          String   @default("gray")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  experience     Int      @default(0)
+  gainedExp      Int      @default(0)
 }

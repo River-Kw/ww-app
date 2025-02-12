@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { WOMClient } from "@wise-old-man/utils";
 
 type Team = {
   id: number;
@@ -8,25 +9,62 @@ type Team = {
   mostRecentDrop: string;
   timeAgo: string;
   logoUrl: string;
-  color: "red" | "blue";
+  color: "brown" | "blue";
+  gainedExp?: number;
 };
 
+// Team Colors Mapping
 const colorClasses = {
-  red: "bg-amber-800",
+  brown: "bg-amber-800",
   blue: "bg-blue-500",
 };
+
+const WISE_OLD_MAN_API_URL = "https://api.wiseoldman.net/v2/competitions/77435";
 
 const Leaderboard: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [bandosExp, setBandosExp] = useState<number>(0);
+  const [armadylExp, setArmadylExp] = useState<number>(0);
 
   useEffect(() => {
-    fetch("/api/teams")
-      .then((res) => res.json())
-      .then(({ teams, lastUpdated }) => {
+    async function fetchData() {
+      try {
+        // Fetch your teams from your API
+        const teamsResponse = await fetch("/api/teams");
+        const { teams, lastUpdated } = await teamsResponse.json();
+
+        // Fetch competition data from Wise Old Man API
+        const client = new WOMClient();
+        const competition = await client.competitions.getCompetitionDetails(
+          77435
+        );
+        const participants = competition.participations || [];
+
+        let bandosTotalGained = 0;
+        let armadylTotalGained = 0;
+
+        // Process each participant and sum their gained XP
+        participants.forEach((participant: any) => {
+          if (participant.teamName === "Bandos") {
+            bandosTotalGained += participant.progress.gained;
+          } else if (participant.teamName === "Armadyl") {
+            armadylTotalGained += participant.progress.gained;
+          }
+        });
+
+        // Update state with total XP gained
+        setBandosExp(bandosTotalGained);
+        setArmadylExp(armadylTotalGained);
+
         setTeams(teams);
         setLastUpdated(formatTimeAgo(lastUpdated));
-      });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
   }, []);
 
   function formatTimeAgo(dateString: string) {
@@ -57,7 +95,7 @@ const Leaderboard: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center space-x-2">
                 <img
-                  src={team.logoUrl || "/logo.png"} // Use fallback if missing
+                  src={team.logoUrl || "/logo.png"}
                   alt="Team Logo"
                   className="h-25 w-25"
                 />
@@ -70,6 +108,11 @@ const Leaderboard: React.FC = () => {
               <div className="flex justify-between items-center mt-2">
                 <span>{team.mostRecentDrop}</span>
               </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-lg font-semibold">Total Gained EXP:</p>
+              {team.name === "Bandos" && <p>{bandosExp.toLocaleString()}</p>}
+              {team.name === "Armadyl" && <p>{armadylExp.toLocaleString()}</p>}
             </div>
           </div>
         ))
