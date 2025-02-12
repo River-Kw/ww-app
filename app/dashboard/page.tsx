@@ -4,7 +4,7 @@ import { ProfileForm } from "./ProfileForm";
 import LeaderboardUpdater from "./LeaderboardUpdater";
 import { redirect } from "next/navigation";
 // import { SignOutButton } from "@/components/buttons";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
