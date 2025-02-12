@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import DiscordProvider from "next-auth/providers/discord";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/lib/prisma"; 
+import prisma from "@/lib/prisma";
 
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
