@@ -7,9 +7,15 @@ const nextConfig = {
         hostname: 'avatars.githubusercontent.com',
         port: '',
         pathname: '/u/**',
+      },
+      {
+        protocol: 'https', 
+        hostname: 'cdn.discordapp.com', 
+        port: '',         
+        pathname: '/avatars/**', 
       }
     ]
   }
 }
 
-module.exports = nextConfig
+module.exports = nextConfig;

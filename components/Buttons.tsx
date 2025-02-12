@@ -16,6 +16,7 @@ export function SignInButton() {
     return (
       <Link href={`/dashboard`}>
         <Image
+          className="rounded-full"
           src={session.user?.image ?? "/mememan.webp"}
           width={32}
           height={32}
@@ -25,9 +26,23 @@ export function SignInButton() {
     );
   }
 
-  return <button onClick={() => signIn()}>Sign in</button>;
+  return (
+    <button
+      className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+      onClick={() => signIn()}
+    >
+      Sign in
+    </button>
+  );
 }
 
 export function SignOutButton() {
-  return <button onClick={() => signOut()}>Sign out</button>;
+  return (
+    <button
+      className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+      onClick={() => signOut()}
+    >
+      Sign out
+    </button>
+  );
 }

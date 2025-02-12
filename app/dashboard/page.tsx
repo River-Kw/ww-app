@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { ProfileForm } from "./ProfileForm";
+import { LeaderboardUpdater } from "./LeaderboardUpdater";
 import { redirect } from "next/navigation";
 // import { SignOutButton } from "@/components/buttons";
 import { authOptions } from "../api/auth/[...nextauth]/route";
@@ -20,10 +21,22 @@ export default async function Dashboard() {
   });
 
   return (
-    <>
-      <h1>Dashboard</h1>
-      {/* <SignOutButton /> */}
-      <ProfileForm user={user} />
-    </>
+    <main className="bg-slate-800 min-h-screen">
+      <div className="container mx-auto py-8">
+        <h1 className="text-3xl font-bold text-center mb-6 text-white">
+          Dashboard
+        </h1>
+        {/* <SignOutButton /> Uncomment and use if needed */}
+        {/* <ProfileForm user={user} /> Uncomment and use if needed */}
+        <div className="">
+          <LeaderboardUpdater
+            teams={[
+              { id: 1, name: "Team A" },
+              { id: 2, name: "Team B" },
+            ]}
+          />
+        </div>
+      </div>
+    </main>
   );
 }
